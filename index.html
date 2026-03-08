@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Valve Archive</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  background-color: #1b2838;
+  color: #c7d5e0;
+}
+
+img {
+  cursor: url('https://raw.githubusercontent.com/SeptemberOne/Cursor/refs/heads/main/crowbar%20small.png') 0 0, auto !important;
+}
+
+
+/* Links */
+a { color: #66c0f4; text-decoration: none; font-weight: bold; }
+td a { color: #ff8c00; }
+td a:hover { text-decoration: underline; color: #ffa500; }
+a:hover { text-decoration: underline; }
+
+/* Cursor */
+body, a:hover, .info-btn, input, table, tr, td, th, tbody, thead, footer, footer * {
+  cursor: url('https://raw.githubusercontent.com/SeptemberOne/Cursor/refs/heads/main/crowbar%20small.png') 0 0, auto !important;
+}
+
+.info-btn { color: #66c0f4; font-weight: bold; margin-left: 10px; }
+.info-btn:hover { text-decoration: underline; color: #8acfff; }
+
+/* Header */
+header { background-color: #171a21; padding: 25px 20px; text-align: center; border-bottom: 3px solid #66c0f4; }
+header h1 { margin: 0; font-size: 2.5rem; color: #ffffff; letter-spacing: 1px; }
+header p { margin: 5px 0 0; color: #a0b0c0; font-size: 1rem; }
+
+/* Container */
+.container { padding: 30px 20px; max-width: 1200px; margin: 0 auto; }
+
+/* Layout */
+.table-and-image {
+  display: flex;
+  justify-content: flex-start;
+  position: relative;
+  gap: 20px;
+}
+
+.table-wrapper {
+  flex: 0 0 1000px;
+  z-index: 1;
+}
+
+/* Floating image wrapper */
+.image-wrapper {
+  position: absolute;
+  right: -200px;
+  animation: float 3s ease-in-out infinite alternate;
+  z-index: 2;
+  max-width: 450px;
+  width: 100%;
+}
+
+/* Image itself */
+.gabe-santa {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.6);
+  transform: rotate(-3deg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: url('https://raw.githubusercontent.com/SeptemberOne/Cursor/refs/heads/main/crowbar%20small.png') 0 0, auto !important;
+}
+
+.gabe-santa:hover {
+  transform: rotate(0deg) translateY(-10px);
+  box-shadow: 0 20px 35px rgba(0,0,0,0.7);
+}
+
+/* Floating animation */
+@keyframes float {
+  0% { transform: translateY(10px); }
+  100% { transform: translateY(-20px); }
+}
+
+/* 💥 Punch animation */
+@keyframes punch {
+  0%   { transform: scale(1); }
+  20%  { transform: scale(0.8) rotate(-3deg); }
+  50%  { transform: scale(1.15) rotate(3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.punch {
+  animation: punch 0.25s ease-out;
+}
+
+/* Search bar */
+#searchBar {
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #2a475e;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background-color: #1b2838;
+  cursor: pointer;
+  user-select: none;
+}
+
+tr:nth-child(even) { background-color: #223447; }
+tr:hover {
+  background-color: #335c80;
+  transform: scale(1.01);
+  transition: all 0.2s ease-in-out;
+}
+
+.file-icon { width: 36px; height: 36px; margin-right: 8px; vertical-align: middle; }
+
+/* Footer */
+footer { cursor: auto; text-align: center; padding: 20px; font-size: 0.9rem; color: #7a8a99; }
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .table-and-image { flex-direction: column; align-items: center; }
+  .table-wrapper { flex: 1 1 100%; margin-left: 0; }
+  .image-wrapper { position: static; margin-top: 20px; max-width: 350px; }
+}
+
+.snowstorm-flakes {
+  filter: blur(0.5px) drop-shadow(0 0 4px rgba(255,255,255,0.8));
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+#snow-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Valve Adatbázis</h1>
+  <p>Játékok * Szoftverek * Szivárgások * Prezentációk * Videók</p>
+</header>
+
+<br>
+
+<div style="text-align: center; margin-bottom: 20px;">
+  <a href="https://www.youtube.com/@valvedatabase/videos" target="_blank" style="color: rgb(255, 166, 0);">
+    YouTube: Valve Adatbázis
+  </a>
+</div>
+
+<div class="container">
+  <div class="table-and-image">
+    <div class="table-wrapper" style="margin-left: -200px;">
+      <input type="text" id="searchBar" placeholder="Search files..." onkeyup="filterFiles()">
+
+      <table id="fileTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">File Name ▲▼</th>
+            <th onclick="sortTable(1)">Download</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon">
+              Portal 2 - Educational Version (Build 62179) (June 2012)
+            </td>
+            <td>
+              <a href="https://www.febbox.com/share/6vnuF4jV" target="_blank">Download</a> |
+              <span class="info-btn" onclick="showInfo('Miután kicsomagoltad ezzel az exe-vel indítod a játékot: LumaGameLauncher_x86.exe.\n\nA Valve által tantermek számára készített ingyenes, speciális kiadás, amely a fizika, a logika és a problémamegoldás tanítására összpontosít a játék alapvető játékmenetén és egyedi Puzzle Makerén keresztül.\n\nA Steam for Schools programon keresztül terjesztették, tanári segédanyagokat és óraterveket kínálva. Bár a főmenüt leegyszerűsítették (eltávolították a kooperatív módot és a robotokkal kapcsolatos bővítéseket), az egyjátékos kampány megmaradt, valamint egy továbbfejlesztett Puzzle Maker is, olyan eszközökkel, mint a Contraption Cube, amely interaktív tananyagok készítését tette lehetővé.\n\nEnnek segítségével a diákok gyakorlatban tanulhatták meg például a gravitáció és a súrlódás fogalmát.')">Info</span>
+            </td>
+          </tr>
+           <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Portal Beta (2005)</td>
+        <td><a href="https://www.febbox.com/share/j3iXdTb1" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A 2005-ös Portal béta összefoglalója:\n\nEz a Portal legkorábbi verziója. Valójában nagyrészt a Half-Life 2 eszközeit használja. Nincs benne GLaDOS, helyette egyszerűen megszöksz. Néhány ismerős tesztkamrát is észrevehetsz benne. Ezek a ma is a játékban szereplő népszerű tesztkamrák korai változatai.')">Info</span></td>
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life 2 Lite (Russian Beta Discs 2003)</td>
+        <td><a href="https://www.febbox.com/share/XGLltfLP" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Half-Life 2 Lite – orosz béta lemezek\n\nA Half-Life 2 Lite Orosz béta lemezek a hírhedt 2003-as Half-Life 2 béta szivárgás illegális, fizikai másolataira utalnak, amelyek az orosz játékosközösségben terjedtek. Maga a Half-Life 2 béta nem hivatalos Valve-kiadás volt, hanem a kiszivárgott, befejezetlen build.')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life 2: Survivor</td>
+        <td><a href="https://www.febbox.com/share/gisree5b" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Half-Life 2: Survivor egy arcade játék, amely a Half-Life 2-n alapul. 2006. június 28-án jelent meg a Taito Type X+ arcade rendszerre. Egy 32 colos, 1360×768 felbontású szélesvásznú HD LCD kijelzőt használ.\n\nA játék egy PC-alapú arcade gépen fut, Windows XP Embedded operációs rendszerrel. A kabinet 5.1-es térhangzással és intelligens kártyával rendelkezik a játékosadatok mentéséhez. Hálózaton keresztül több arcade terem játékosai is játszhatnak egymással.')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life: Underworld – Bloodline (2003)</td>
+        <td><a href="https://www.febbox.com/share/BodVRMdm" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Az Underworld: Bloodline egy nem kanonikus Half-Life mod, amelyet a Black Widow Games készített a Sony számára, és 2003-ban jelent meg az első film előtt. Négy pálya érhető el: város, gyár, erőd és vonat. A cél több Hibrid megmentése és védelme a két faj közötti háborúban való előny megszerzéséhez. A játékosok választhatnak a Vámpírok vagy a Likánok oldalán, mindkét oldal négy osztállyal rendelkezik.')">Info</span></td>
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life 2 béta — Mega Build (2024)</td>
+        <td><a href="https://www.febbox.com/share/EwOvJn6d" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Half-Life 2 Beta: Mega Build az összes, 2003 óta készült javítás, patch és mod gyűjteménye a Half-Life 2 „béta” verziójához. Nincs több keresgélés, ütköző tartalom vagy több külön telepítés.\n\nA build tartalma:\n\nMod Launcher – modok és csomagok indítására\nLeakNet HL2 Beta – a játék indítása modok nélkül\nE3 2002 – a törölt E3 2002-es bemutató korai demókkal\nE3 2003 – a Valve által nyilvánosan bemutatott verzió\n2000–2003 közötti mappackek különböző fejlesztési időszakokból\n2003 Leak Story – az eredeti 2003-as szivárgott build pályái (XJR9000 javításaival)\nMinden pálya javítva lett és játszható, a korszaknak megfelelő vizuális megjelenéssel.\n\nFigyelem! Ez nem egy teljes játék. Nem „régi történet visszaállítás”, nem klasszikus béta mod.\nA pályákat a fejlesztői konzolból kell indítani a map paranccsal.\n\nA különálló játék mappákat a LeakNet Mod Launcherrel kell elindítani.\n')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life: Decay (2001)</td>
+        <td><a href="https://www.febbox.com/share/JDbdp9eH" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Ez a játék PlayStation 2-re jelent meg eredetileg, és a Black Mesa incidens időszakában játszódik.\n\nMegjelenés: 2001. november 14.\n\nA Half-Life: Decay egy kiegészítő, amely a Half-Life PS2-es változatában jelent meg, a Gearbox Software fejlesztésében.\n\nAz Opposing Force és a Blue Shift kiegészítőkhöz hasonlóan a Decay is visszatér az eredeti történethez és idővonalhoz, de új főszereplőkkel: Gordon Freeman két női kollégájával, Gina Cross-szal és Colette Green-nel. Dr. Cross a Hazard Course hologram modellje, és a Blue Shift egy pontján is látható. Dr. Green egy kifejezetten a Decay számára létrehozott új karakter.\n\nBár a Gearbox elkészítette a PC-s portot, az sosem jelent meg a fejlesztőkön kívül álló okok miatt, és a játék a Valve Steam szolgáltatásán keresztül sem érhető el.\n')">Info</span></td>
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> ThreeWave - Capture the Flag (2003)</td>
+        <td><a href="https://www.febbox.com/share/ssrZnevQ" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Valve által készített, de soha meg nem jelent ThreeWave CTF mod portja a Deathmatch Classic-hoz.\n\nEz a verzió kifejezetten a Half-Life Steam-verziójával való kompatibilitásra lett javítva.\n\nA Deathmatch Classic telepítése szükséges.\n')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life: Uplink (1999)</td>
+        <td><a href="https://www.febbox.com/share/echPkfOo" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Valve 1998-as belső nézetes lövöldözős játékának, a Half-Life-nak egy demóverziója, amely 1999. február 12-én jelent meg.\n\nAz Uplink sok olyan ellenséget, karaktert és fegyvert tartalmaz, amelyek a teljes játékban is szerepelnek, azonban a helyszín és a történet nem jelenik meg a végleges Half-Life-ban. Az Uplink pályáit a fejlesztés során kivágták, és nagyjából a Lambda Core fejezet előtt vagy alatt helyezkednek el időrendben, de a demóhoz jelentősen átdolgozták őket. Az Uplink tartalmazza a teljes játékból ismert Hazard Course-t is.\n\nA Half-Life: Uplink a Half-Life Steam-verziójába is bekerült játszható kampányként a 25. évfordulós frissítésben, 2023. november 17-én.')">Info</span></td>
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life 2 Beta Kiszivárgott Verzió (2003)</td>
+        <td><a href="https://www.febbox.com/share/l1eO75u4" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Source motor forráskódját 2003. október 2-án, a játék egy befejezetlen verzióját pedig október 7-én szivárogtatták ki az internetre Axel Gembe egyik ismerőse által.\n\nGabe Newell nyilvánosan magyarázta el a helyzetet a rajongói oldalon, a Halflife2.net (ma ValveTime) fórumain, és segítséget kért a közösségtől a hackerek felkutatásához. Gembe-t később letartóztatták, de a vádak nem közvetlenül a szivárogtatáshoz kapcsolódtak.')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life 0.52 (1997)</td>
+        <td><a href="https://www.febbox.com/share/tXtpMX5D" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Ez a Half-Life 0.52-es sajtóverziójának lemezképe, amelyet gyakran a játék „alfa” verziójaként emlegetnek.\n\nAz archívum forráslemeze azok közül való, amelyeket a Valve 1997 szeptemberében küldött ki videojátékos magazinoknak és újságíróknak. Az egyik ilyen alfa lemez tulajdonosa 2013-ban tette közzé a lemezképet Redditen.\n\nEbben a Half-Life alfa verzióban (0.52) 21 pálya található különböző fejezetekből, játékmenet-videók, valamint 15 darab .demo fájl, amelyeket a Valve rögzített.')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life: Day One (1997)</td>
+        <td><a href="https://www.febbox.com/share/yi41zPFW" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Half-Life első megjelenés előtti demója.\n\nKifejezetten OEM-partnerségekhez készült, és gyakran videokártyák mellé csomagolták. Később a Half-Life: Initial Encounter gyűjtemény részeként is árulták.\n\nA demó kiszivárgott, és a Half-Life már a hivatalos megjelenés előtt hatalmas figyelmet kapott. A Half-Life hivatalos, ingyenes demója a nagyközönség számára a Half-Life: Uplink, amely néhány hónappal a teljes játék megjelenése után jelent meg.')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life NetTest 1 (Béta 9) (1998)</td>
+        <td><a href="https://www.febbox.com/share/tyCdRWJb" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Half-Life megjelenés előtti buildje, amelyet zárt többjátékos tesztelésekhez használtak. Több eltérést tartalmaz a végleges verzióhoz képest (például játszható, kivágott Xen és kooperatív pályák). Korai Worldcraft és egyéb eszközök is megtalálhatók benne.\n\nBuild verzió: 722 (1998. október 16.)\n\n\nIndítás:\n\nCsomagold ki a ZIP archívumot\nIndítsd el a hl.exe-t')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Half-Life NetTest 2 (Béta 12) (1998)</td>
+        <td><a href="https://www.febbox.com/share/eqR2OrAm" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Half-Life egy későbbi, megjelenés előtti buildje, szintén zárt többjátékos teszteléshez.\n\nBuild verzió: 725 (1998. október 19., kb. 3 héttel a megjelenés előtt)\n\nIndítás:\nCsomagold ki a ZIP archívumot\nIndítsd el a hl.exe-t')">Info</span></td>
+      </tr>
+
+        <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon">  Half-Life: Source Beta (2003)</td>
+        <td><a href="https://www.febbox.com/share/zgQ99u6I" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Egy egyedi Half-Life: Source build 2003 környékéről.\n\nA „kiszivárgott” Half-Life: Source teljesen játszható és stabil változata.\n\nTelepítési útmutató:\n\nCsomagold ki a fő archívumot\nIndítsd el az egyik .bat fájlt')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon">  Half-Life: Source Beta (HL1-portok) (2003)</td>
+        <td><a href="https://www.febbox.com/share/fVfA5JYu" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Az úgynevezett „HL1-portok” a Valve GoldSrc motoros játékainak átiratai a kiszivárgott Source motorra.\n\nEzeket 2003-ban lopták el a Valve akkori aktuális tartalmaival együtt. Ezzel az archívummal játszhatóvá válnak a Half-Life 1 és a Counter-Strike 1.6 Source motoros portjai.\n\nAz archívumban egy régi, elavult Team Fortress 2 verzió maradványai is megtalálhatók.')">Info</span></td>
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon">  Half-Life: Opposing Force Press Demo (1999)</td>
+        <td><a href="https://www.febbox.com/share/gSAiJA4Q" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Ez a Half-Life: Opposing Force egy sajtóverziós build-je a Gearbox Software-től, amelyet annak idején több videojátékos médium kapott meg tesztelés és értékelés céljából.\n\nAz eredeti lemezt egy volt IGN-alkalmazott adta el egy online aukciós oldalon Alan „Magic Nipples” Deckernek. Később a lemez tartalma nyilvánosságra került. Ez a build több változtatást tartalmaz a bolti (retail) verzióhoz képest.\n\nA build csak telepített Half-Life v1.0.1.3 (WON) fölött működik, a Steam-verzió nem támogatott.')">Info</span></td>
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon">  Left 4 Dead: Survivors (2014)</td>
+        <td><a href="https://www.febbox.com/share/Lv4679GA" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Left 4 Dead: Survivors, más néven Left 4 Dead: Arcade, a Left 4 Dead 2 japán változata, amelyet kifejezetten japán arcade gépekre terveztek át, és egy teljesen új túlélőcsapatot tartalmaz.\n\nA játék továbbra is az Egyesült Államokban játszódik, és ugyanazokat a pályákat használja, mint a Left 4 Dead és a Left 4 Dead 2, azonban a szereplők megjelenését és stílusát láthatóan a japán közönség ízléséhez igazították.\n\nA játékot kezdetben Project Z néven teaselték, mielőtt hivatalosan bemutatták volna 2014. április 30-án.')">Info</span></td>
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon">  Terror-Strike (Left 4 Dead Prototípusa) (2005)</td>
+        <td><a href="https://www.febbox.com/share/QO2grIz3" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Valve véletlenül lefordította és közzétette a Left 4 Dead legkorábbi prototípusát, amely a „Terror Strike” nevet viselte, egy Counter-Strike 1.6 frissítés részeként.\n\nA közösség később rájött, hogyan lehet játszani vele.')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike: Condition Zero TRS Beta (2003)</td>
+        <td><a href="https://www.febbox.com/share/24IwFVmL" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Ez a Counter-Strike: Condition Zero egy olyan buildje, amely a 2003-as Half-Life 2 szivárgások során került napvilágra.\n\nA „Half.Life.Including.Condition.Zero.READ.NFO-ANON” (anon-hl2_wmods) archívumban található meg „cstrike_trs” néven. Ez a Condition Zero többjátékos / offline botokkal játszható része, amelyet a Turtle Rock Studios fejlesztett. A build nyers bot hangokat tartalmaz, még a rádiószűrő alkalmazása előtti állapotban. Számos pálya eltér a bolti verziótól, valamint több olyan pálya is megtalálható benne, amely végül kimaradt a játékból.\n\nEz az egyedi, önálló build minimális módosításokkal készült az eredeti tartalomhoz képest. Az egyetlen változtatás a hibás GUI-elemek javítása, valamint egy olyan pálya hozzáadása volt, amely nem szerepelt a szivárgásban (cs_arcticbiolab). A hiányzó textúrákat szándékosan nem javították az autentikusság megőrzése érdekében.')">Info</span></td>
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike: Global Offensive – PAX (2011)</td>
+        <td><a href="https://www.febbox.com/share/MCzI9S8i" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Ez a Counter-Strike: Global Offensive build a PAX 2011 bemutatóra készült.\n\nA build dátuma: 2011. augusztus 8.\n\nEz a verzió már több javítást és kiegészítést tartalmaz, hogy kényelmesen játszható legyen, és megtekinthető legyen az összes kivágott tartalom és különbség. Az eredeti buildhez képest található eltérések a ReadMe fájlban olvashatók.\n\nFontos:\nEgyes vírusirtók (például az Avast) tévesen vírusnak jelölhetik ezt a buildet indításkor. Javasolt kizárni az .exe fájlt tartalmazó mappát az ellenőrzésből.\n\nTelepítés:\n\nCsomagold ki az archívumot bárhová a merevlemezen\nIndítsd el a megfelelő .bat fájlt, vagy az .exe fájlt a kívánt paraméterekkel\nJáték közben ajánlott leállítani a Steam klienst, különben megjelenhet a „No Steam logon” hiba, és a szerver kidobhat.')">Info</span></td>
+      </tr>
+      
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike Beta 1.0 (1999. június 19.)</td>
+        <td><a href="https://www.febbox.com/share/7rvdAeQj" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A mód első megjelenése.\n\nElérhető fegyverek:\nGlock 18\nUSP\nM3\nTMP\nMP5\nM4A1\nAWSM\nG3SG/1\nM249\n\nElérhető pályák (CS mód):\nSiege\nMansion\nWpndepot\nPrison\nJátékosmodellek:\n\nTerroristák: Ír Köztársasági Hadsereg (IRA)\nTerrorelhárítók: SEAL Team 6 (DEV GRU)\n\nTelepítés és futtatás:\nFuttasd a telepítőt\nHa nem találja a megfelelő Half-Life verziót, add meg manuálisan az elérési utat\nVálasztható az alapértelmezett vagy egyedi billentyűkiosztás\nIndítsd el a hl.exe-t → „Custom Game”\n„Multiplayer” → „LAN Game” → „Create Server”\n\nFigyelem:\nWON-os Half-Life v1.0.1.6 vagy újabb szükséges\nSteam-verzióval nem kompatibilis\nGrafikai beállításoknál ajánlott a Software render mód.')">Info</span></td>
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike Beta 1.1 (1999. június 27.)</td>
+        <td><a href="https://www.febbox.com/share/bcJmd58u" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Játékmenet-változások:\n\nJavított szerverstabilitás\nLőszer- és felszerelés-hibák javítva\nGazdaság enyhén újraegyensúlyozva\nmp_friendlyfire parancs hozzáadva\nPályaváltás javítva\n\nFelület:\nÚj G3SG1 távcső\n\nHangok:\nÚjrarögzített rádióhangok\nÚj USP lövési hang\n\nPályák:\nÚj: Assault, Desert\nSiege és Wpndepot frissítve\n\nFegyverek:\nGlock 18 félautomata mód\n\n(Telepítés és követelmények megegyeznek a béta 1.0-val)')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike Beta 2.0 (1999. augusztus 13.)</td>
+        <td><a href="https://www.febbox.com/share/2sjnLhNL" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Játékmenet:\n\nKöridő és csapatpontok hozzáadva\nÉjjellátó szemüveg\nBillentyűkiosztás módosítása\nÚj konzolparancsok (sv_limitteams, sv_lowlag, stb.)\n\nModellek:\nOptimalizált játékosmodellek\nJavított terrorista modell\n\nPályák:\nÚjak: Bunker, Docks, Facility, Alley1, Zoption\nTörölve: Mansion, Prison, Wpndepot\n\nFegyverek:\nAK-47, Desert Eagle, SG-552\nHangtompítók USP-hez és M4A1-hez\n\nCsapatok:\nIRA → Phoenix Faction\n\nFontos: a rendszer dátumát 1999 nyarára kell állítani.')">Info</span></td>
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike Beta 3.0 / 3.1 (1999. szeptember)</td>
+        <td><a href="https://www.febbox.com/share/sOE73kvN" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Újdonságok:\n\nJavított túsz AI\nÚj rádióparancsok\nKés, P90\nPáncél + sisak\nÚj csapatok (GSG-9, Durah Cell)\nHibajavítások (pl. MRAD_ENEMYSPOTTED)')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike Beta 4.0 (1999. november 5.)</td>
+        <td><a href="https://www.febbox.com/share/sw0vuSZK" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Újdonságok:\n\nBombahatástalanítási mód\nÚj pályák: Dust, Nuke, Prodigy, Station\nP228, Scout, HE gránát\nVisszarúgás- és szórásrendszer frissítése')">Info</span></td> 
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike Beta 5.0/5.2 (1999–2000)</td>
+        <td><a href="https://www.febbox.com/share/sw0mnvMa" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Fontos változások:\n\nC4 külön slotban\nDefuse kit vásárolható\nHatástalanítás ideje módosítva\nNéző mód átdolgozva\nÚj HUD, ikonok, tippek\nÚj pályák és fegyverek (XM1014)')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike Beta 6.0/6.1/6.5/6.6 (2000)</td>
+        <td><a href="https://www.febbox.com/share/Wq5MnngN" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Újdonságok:\n\nRadar\nEscort (AS) és Escape (ES) módok\nÚj fegyverek: MAC-10, AUG\nFüstgránát\nHálózati rendszer teljes átdolgozása\nPályaszavazás')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike Beta 7.0/7.1 (2000)</td>
+        <td><a href="https://www.febbox.com/share/idjO5MUW" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Újdonságok:\n\nTeljes VGUI integráció\nKét Beretta\nJárművek támogatása\nHeadshot ikon\nJavított lövedékszórás és célkereszt')">Info</span></td> 
+      </tr>
+
+       <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike: Source Beta (2004)</td>
+        <td><a href="https://www.febbox.com/share/6AImyyth" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Counter-Strike: Source béta 2004. augusztus 11-én vált elérhetővé a Valve Cyber Café Program tagjai számára.\n\n2004. augusztus 18-án megkapták a Condition Zero tulajdonosai és azok is, akik Half-Life 2 kupont kaptak ATI Radeon videokártyák mellé.')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Counter-Strike: Source Pre-Alfa (2003)</td>
+        <td><a href="https://www.febbox.com/share/B6a7aiq9" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Egy egyedi Counter-Strike: Source build, amely a „hl-ports” archívumból származó kiszivárgott assetekre épül.\n\nNem igényli az eredeti HL2 béta vagy szivárgott buildet.Számos javítást és kiegészítést tartalmaz, de továbbra is instabil. Minden hozzáadott tartalom eredeti.\n\nTelepítés:\n\nCsomagold ki az archívumot\nÁllítsd a HL2.exe kompatibilitási módját Windows XP SP3-ra\nFuttasd a cstrike.bat fájlt')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/fluency/48/xbox-controller--v1.png" class="file-icon"> Lamarr Goes to the Zoo (2013)</td>
+        <td><a href="https://www.febbox.com/share/DZxVtYgM" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Lamarr Goes to the Zoo (a címképernyőn hibásan „Lamar” néven szerepel) egy oldalnézetes platformjáték, amelyet több Valve-alkalmazott készített egy 48 órás game jam keretében.\n\nA játék a Construct 2 nevű, HTML5-alapú játékszerkesztőben készült 2013. március 16–17. hétvégéjén, és 2013. március 21-én jelent meg, amikor Jeep Barnett közzétette egy Facepunch fórumtémában.')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/3d-fluency/94/software.png" class="file-icon"> Source 2 Viewer (2014)</td>
+        <td><a href="https://www.febbox.com/share/hnb9a83s" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Egy nagy teljesítményű eszköz, amely lehetővé teszi VPK archívumok böngészését, valamint Source 2 assetek megtekintését, exportálását és visszafejtését (dekompilálását), beleértve a pályákat, modelleket, anyagokat, textúrákat, hangokat és sok mást.\n\nEz a nyílt forráskódú projekt teljes egészében visszafejtésen (reverse engineeringen) alapul, mivel nem létezik hivatalos Source 2 SDK.\n\nMinden Source 2 projektet támogat, többek között:\n\nCounter-Strike 2\nDota 2\nDeadlock\nHalf-Life: Alyx\nSteamVR')">Info</span></td> 
+      </tr>
+      
+
+      <tr>
+        <td><img src="https://img.icons8.com/3d-fluency/94/software.png" class="file-icon"> Source Particle Benchmark (2006)</td>
+        <td><a href="https://www.febbox.com/share/3MBx2H5t" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Source Particle Benchmark, más néven Multicore CPU Particle Simulation Benchmark, egy 2006 végén készült tesztprogram, amely bemutatta a Source motor néhány újabb és fejlettebb funkcióját, valamint a Valve hibrid szálkezelési technológiáját.\n\nIlyen funkciók például a dinamikus árnyékok és a részecskealapú effektek, illetve ezek teljesítménye többmagos processzorokon.A benchmark több szkriptet, modellt, textúrát, valamint egyetlen bemutató pályát tartalmaz, ahol öt szoba járható be, amelyek közül négy részecskeeffekteket tartalmaz. Egy nagyobb benchmark-sorozat részeként a Valve a GDC 2007 egyes látogatóinak, valamint más személyeknek is kiosztotta.')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/3d-fluency/94/software.png" class="file-icon"> GCFScape (2004)</td>
+        <td><a href="https://www.febbox.com/share/SdxtCkrd" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('Egy kisméretű eszköz, amely képes megnyitni és kicsomagolni azokat a GCF fájlokat, amelyeket a Steam korábban a játékadatok tárolására használt.\n\nA GCFScape legfrissebb verziója: 1.8.6.\n\nA GCFScape 1.7.1 vagy újabb verziója szükséges a VPK fájlok megnyitásához, amelyeket a Left 4 Dead motorágával és a Source 2013-mal vezettek be.\nA program visszamenőleges kompatibilitást is biztosít a régebbi Source játékokhoz, amelyek csak közvetlen fájlrendszerből vagy .gcf fájlokból töltődnek be (egészen a Source 2004-ig), úgynevezett Depot VPK fájlok használatával. Emellett alapértelmezetten támogatja a Source 2 VPK fájlokat is.')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/color/48/pdf.png"" class="file-icon"> Half-Life 2: Raising the Bar (2004)</td>
+        <td><a href="https://www.febbox.com/share/JnaZVWwA" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Raising the Bar egy könyv, amelyet David Hodgson írt, és a Prima Games adott ki 2004 novemberében, kemény- és puhafedeles kiadásban.\n\nA könyv képek gyűjteményét tartalmazza, amelyek végigkövetik a Half-Life, Team Fortress, Day of Defeat, Counter-Strike, Counter-Strike: Source és a Half-Life 2 fejlesztésének folyamatát. A szöveges részek játéktervezési és fejlesztési jegyzeteket, kivágott koncepciókat, szinkronszínészekkel kapcsolatos információkat, valamint általános fejlesztési háttéranyagokat tartalmaznak. A könyvet számos, a Valve munkatársaival készült interjú is gazdagítja.')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/color/48/pdf.png" class="file-icon"> Half-Life 2: Raising the Bar (Javítatlan Korrektúrapéldány) (2004)</td>
+        <td><a href="https://www.febbox.com/share/yJZImQg6" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Raising the Bar – Uncorrected Proof a Prima Raising the Bar könyvének egy megjelenés előtti változata, amelyet nem értékesítésre vagy terjesztésre szántak.\n\nEzt a verziót kizárólag belső használatra készítették, azzal a céllal, hogy átnézzék és kijavítsák a szerzők és szerkesztők esetleges tévedéseit és hibáit. A könyv egyik példányát 2016-ban az eBayen kínálták eladásra, ahol egy Half-Life rajongó megvásárolta. Ezt követően egy beszkennelt változat nyilvánosan is elérhetővé vált.\n\nEz a kiadás puhafedeles, és közel 100 oldallal vastagabb, mint az eredeti könyv. Az egyik legjelentősebb különbség, hogy sokkal több információt tartalmaz az első Half-Life fejlesztéséről. Emellett exkluzív, korábban soha nem látott koncepciórajzokat és egyéb, a Half-Life 2-höz kapcsolódó anyagokat is magában foglal.')">Info</span></td> 
+      </tr>
+
+      <tr>
+        <td><img src="https://img.icons8.com/color/48/musical-notes.png" class="file-icon"> Valve Games Soundtracks</td>
+        <td><a href="https://www.febbox.com/share/yJZImQg6" target="_blank">Download</a>
+         |
+  <span class="info-btn" onclick="showInfo('A Valve játékok zenéi, melyeket elsősorban Kelly Bailey, Mike Morasky és Tim Larkin szerzett, ikonikus, ipari és elektronikus zenék. A legfontosabb zenék közé tartozik a Half-Life (1 és 2), a Portal (1 és 2), a Team Fortress 2, a Dota 2 és a Left 4 Dead, amelyeket gyakran az Ipecac Recordings ad ki.')">Info</span></td> 
+      </tr>
+
+
+
+
+
+
+        </tbody>
+      </table>
+    </div>
+
+    <div class="image-wrapper" style="top: 0;">
+      <img src="https://cdaction.pl/wp-content/uploads/2025/12/steam-zimowa-wyprzedaz-7903.jpg" class="gabe-santa">
+    </div>
+
+    <div class="image-wrapper" style="top: 280px;">
+      <img src="https://images.steamusercontent.com/ugc/2264812245438298441/D9EB3BDF4B6BECA169EE31B68307085390F8755A/?imw=1024" class="gabe-santa">
+    </div>
+
+    <div class="image-wrapper" style="top: 590px;">
+      <img src="https://www.well-played.com.au/wp-content/uploads/2015/12/xyP8SBi.jpg" class="gabe-santa">
+    </div>
+
+    <div class="image-wrapper" style="top: 900px;">
+      <img src="https://cdn.mos.cms.futurecdn.net/b276c2c0b6abae3557bdad4a67c47444.jpg" class="gabe-santa">
+    </div>
+    
+    <div class="image-wrapper" style="top: 1210px;">
+      <img src="https://i.ytimg.com/vi/vnW0bARyXfo/maxresdefault.jpg" class="gabe-santa">
+    </div>
+
+    <div class="image-wrapper" style="top: 1520px;">
+      <img src="https://raw.githubusercontent.com/SeptemberOne/Cursor/refs/heads/main/w39plm2w8w8e1.jpeg" class="gabe-santa">
+    </div>
+
+    <div class="image-wrapper" style="top: 1830px;">
+      <img src="https://raw.githubusercontent.com/SeptemberOne/Cursor/refs/heads/main/l4dchristmas.jpg" class="gabe-santa">
+    </div>
+
+    <div class="image-wrapper" style="top: 2140px;">
+      <img src="https://raw.githubusercontent.com/SeptemberOne/Cursor/refs/heads/main/Dota2%20Christmas.jpg" class="gabe-santa">
+    </div>
+
+
+
+  </div>
+</div>
+
+<footer>
+  Powered by Valve Adatbázis
+</footer>
+
+<script>
+function filterFiles() {
+  const input = document.getElementById("searchBar").value.toLowerCase();
+  const trs = document.querySelectorAll("#fileTable tbody tr");
+  trs.forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(input) ? "" : "none";
+  });
+}
+
+function sortTable(col) {
+  const table = document.getElementById("fileTable");
+  let rows = Array.from(table.rows).slice(1);
+  let asc = table.dataset.sort !== "asc";
+  table.dataset.sort = asc ? "asc" : "desc";
+
+  rows.sort((a, b) => {
+    let x = a.cells[col].textContent.toLowerCase();
+    let y = b.cells[col].textContent.toLowerCase();
+    return asc ? x.localeCompare(y) : y.localeCompare(x);
+  });
+
+  rows.forEach(row => table.tBodies[0].appendChild(row));
+}
+
+function showInfo(text) { alert(text); }
+
+/* 💥 Punch on click */
+document.querySelectorAll('.gabe-santa').forEach(img => {
+  img.addEventListener('click', function () {
+    this.classList.remove('punch');
+    void this.offsetWidth; // force reflow
+    this.classList.add('punch');
+  });
+});
+</script>
+
+<canvas id="snowCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById('snowCanvas');
+const ctx = canvas.getContext('2d');
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+
+window.addEventListener('resize', () => {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+});
+
+class Snowflake {
+  constructor(layer) {
+    this.layer = layer; // 0 = background, 1 = foreground
+    this.reset();
+  }
+
+  reset() {
+    this.x = Math.random() * width;
+    this.y = Math.random() * height;
+    if (this.layer === 0) {
+      this.size = 1 + Math.random() * 1;
+      this.speed = 0.3 + Math.random() * 0.5;
+    } else {
+      this.size = 2 + Math.random() * 1;
+      this.speed = 0.8 + Math.random() * 1; // slightly faster foreground
+    }
+    this.wind = Math.random() * 1 - 0.5;
+    this.opacity = 0.5 + Math.random() * 0.5;
+    this.icyGlow = Math.random() < 0.3;
+    this.sparkle = Math.random() < 0.1;
+  }
+
+  update() {
+    this.x += this.wind + Math.sin(Date.now()/1000 + this.y/50) * 0.5;
+    this.y += this.speed;
+    if (this.y > height) this.y = -this.size;
+    if (this.x > width) this.x = 0;
+    if (this.x < 0) this.x = width;
+  }
+
+  draw() {
+    if (this.layer === 0) {
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255,255,255,${this.opacity})`;
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+      ctx.fill();
+      return;
+    }
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.strokeStyle = this.icyGlow ? `rgba(180,230,255,${this.opacity})` : `rgba(255,255,255,${this.opacity})`;
+    ctx.lineWidth = Math.max(this.size / 2, 1);
+    if (this.icyGlow) {
+      ctx.shadowColor = `rgba(180,230,255,0.8)`;
+      ctx.shadowBlur = 5;
+    }
+
+    let armLength = this.size * 3; // smaller arms
+
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, -armLength);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, -armLength*0.3);
+      ctx.lineTo(-armLength*0.1, -armLength*0.4);
+      ctx.moveTo(0, -armLength*0.3);
+      ctx.lineTo(armLength*0.1, -armLength*0.4);
+
+      ctx.moveTo(0, -armLength*0.6);
+      ctx.lineTo(-armLength*0.1, -armLength*0.7);
+      ctx.moveTo(0, -armLength*0.6);
+      ctx.lineTo(armLength*0.1, -armLength*0.7);
+      ctx.stroke();
+
+      ctx.rotate(Math.PI / 3);
+    }
+
+    ctx.restore();
+
+    if (this.sparkle && Math.random() < 0.02){
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(255,255,255,1)';
+      ctx.arc(this.x, this.y, this.size/2, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+}
+
+// Create snowflakes
+const flakes = [];
+for(let i = 0; i < 50; i++) flakes.push(new Snowflake(0)); // background
+for(let i = 0; i < 50; i++) flakes.push(new Snowflake(1)); // foreground
+
+function animate() {
+  ctx.clearRect(0, 0, width, height);
+  flakes.forEach(flake => {
+    flake.update();
+    flake.draw();
+  });
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+<style>
+#snowCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+</style>
+
+
+
+
+
+
+</body>
+</html>
